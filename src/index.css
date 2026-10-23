@@ -1,0 +1,255 @@
+/* ---------- Couleurs et réglages communs ---------- */
+:root {
+  --vert: #6aaa64;
+  --vert-fonce: #538d4e;
+  --jaune: #c9b458;
+  --gris: #787c7e;
+  --fond: #f4f6f8;
+  --carte: #ffffff;
+  --texte: #1a1a1b;
+  --texte-doux: #5c6168;
+  --bordure: #d9dde1;
+  --ombre: 0 4px 24px rgba(20, 30, 40, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ---------- Page ---------- */
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--texte);
+  text-align: center;
+  /* deux taches de couleur douces dans les coins, par-dessus le fond gris clair */
+  background:
+    radial-gradient(circle at 10% 0%, rgba(106, 170, 100, 0.18), transparent 40%),
+    radial-gradient(circle at 90% 100%, rgba(201, 180, 88, 0.2), transparent 40%),
+    var(--fond);
+  background-attachment: fixed;
+}
+
+#root {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px 16px;
+}
+
+/* ---------- Titres et textes ---------- */
+h1 {
+  margin: 0 0 12px;
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  /* texte rempli par un dégradé vert vers jaune */
+  background: linear-gradient(90deg, var(--vert-fonce), var(--jaune));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+p {
+  margin: 0 0 12px;
+  line-height: 1.6;
+  color: var(--texte-doux);
+}
+
+a {
+  color: var(--vert-fonce);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ---------- Boutons ---------- */
+button {
+  padding: 12px 24px;
+  font: inherit;
+  font-weight: 700;
+  color: white;
+  background: var(--vert);
+  border: none;
+  border-radius: 10px;
+  /* l'ombre pleine donne un effet de touche de clavier */
+  box-shadow: 0 3px 0 var(--vert-fonce);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
+}
+
+button:hover {
+  background: #5fa058;
+}
+
+button:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--vert-fonce);
+}
+
+/* utile au palier 2 : bouton bloqué pendant la vérification */
+button:disabled {
+  background: var(--gris);
+  box-shadow: 0 3px 0 #5e6264;
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* anneau visible quand on navigue au clavier */
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(106, 170, 100, 0.5);
+  outline-offset: 2px;
+}
+
+/* ---------- Cartes (accueil et fin de partie) ---------- */
+.page-accueil,
+.fin-partie {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 20px;
+  box-shadow: var(--ombre);
+}
+
+/* ---------- Page d'accueil ---------- */
+.page-accueil {
+  padding: 40px 28px;
+  animation: apparition 0.5s ease both;
+}
+
+.page-accueil form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.page-accueil input {
+  flex: 1;
+  min-width: 170px;
+  max-width: 260px;
+  padding: 12px 14px;
+  font: inherit;
+  color: var(--texte);
+  background: #fbfcfc;
+  border: 2px solid var(--bordure);
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+
+.page-accueil input:focus {
+  outline: none;
+  border-color: var(--vert);
+}
+
+.liens-accueil {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.liens-accueil a,
+.fin-partie a {
+  padding: 8px 18px;
+  color: var(--texte);
+  background: white;
+  border: 2px solid var(--bordure);
+  border-radius: 999px;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.liens-accueil a:hover,
+.fin-partie a:hover {
+  border-color: var(--vert);
+  transform: translateY(-2px);
+}
+
+/* ---------- Page de jeu ---------- */
+.page-jeu {
+  animation: apparition 0.4s ease both;
+}
+
+.page-jeu h1 {
+  margin-bottom: 20px;
+  font-size: clamp(1.4rem, 5vw, 1.9rem);
+}
+
+/* ---------- Écran de fin de partie ---------- */
+.fin-partie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 28px;
+  padding: 24px 20px;
+  animation: pop 0.35s ease both;
+}
+
+.fin-partie p {
+  width: 100%;
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--texte);
+}
+
+/* le 2e paragraphe = les points, mis en avant */
+.fin-partie p:nth-of-type(2) {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--vert-fonce);
+}
+
+/* ---------- Messages (prévus pour le palier 2) ---------- */
+.message {
+  max-width: 360px;
+  margin: 12px auto;
+  padding: 10px 16px;
+  font-weight: 600;
+  color: #6b5a14;
+  background: #fff7dd;
+  border: 1px solid #ecdc9a;
+  border-radius: 10px;
+  animation: pop 0.25s ease both;
+}
+
+.message.erreur {
+  color: #8c2323;
+  background: #fde8e8;
+  border-color: #f3b8b8;
+}
+
+/* ---------- Animations ---------- */
+@keyframes apparition {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.9); }
+  60% { transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* respecte les personnes qui désactivent les animations dans leur système */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- Petits écrans ---------- */
+@media (max-width: 480px) {
+  #root {
+    padding: 24px 12px;
+  }
+
+  .page-accueil {
+    padding: 28px 16px;
+  }
+}
