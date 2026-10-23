@@ -11,10 +11,13 @@ export function creerEtatInitial(motMystere) {
     resultats: [],           // les couleurs de chaque mot validé
     propositionEnCours: '',  // la ligne en cours de saisie
     statut: 'en_cours',      // 'en_cours' | 'gagne' | 'perdu'
+    verification: false,     // true pendant qu'on interroge le dictionnaire
+    message: '',             // message affiché au joueur
+    messageErreur: false,    // true = message d'erreur (en rouge)
+    nbRefus: 0,              // nombre de mots refusés (servira à l'animation de tremblement)
   }
 }
 
-// Reçoit l'état actuel + une action, et renvoie le NOUVEL état
 export function reducteurPartie(etat, action) {
   // Partie finie : on ne peut plus rien faire (sauf recommencer)
   if (etat.statut !== 'en_cours' && action.type !== 'NOUVELLE_PARTIE') {
@@ -23,16 +26,47 @@ export function reducteurPartie(etat, action) {
 
   switch (action.type) {
     case 'AJOUTER_LETTRE': {
-      // pas plus de 5 lettres
-      if (etat.propositionEnCours.length >= LONGUEUR_MOT) {
+      // pas de saisie pendant la vérification, ni plus de 5 lettres
+      if (etat.verification || etat.propositionEnCours.length >= LONGUEUR_MOT) {
         return etat
       }
-      return { ...etat, propositionEnCours: etat.propositionEnCours + action.lettre }
+      return {
+        ...etat,
+        propositionEnCours: etat.propositionEnCours + action.lettre,
+        message: '',
+        messageErreur: false,
+      }
     }
 
     case 'EFFACER_LETTRE': {
-      // slice(0, -1) enlève la dernière lettre
-      return { ...etat, propositionEnCours: etat.propositionEnCours.slice(0, -1) }
+      if (etat.verification) {
+        return etat
+      }
+      return {
+        ...etat,
+        propositionEnCours: etat.propositionEnCours.slice(0, -1),
+        message: '',
+        messageErreur: false,
+      }
+    }
+
+    case 'DEBUT_VERIFICATION': {
+      // ligne incomplète, ou vérification déjà en cours : on ne fait rien
+      if (etat.verification || etat.propositionEnCours.length !== LONGUEUR_MOT) {
+        return etat
+      }
+      return { ...etat, verification: true, message: '', messageErreur: false }
+    }
+
+    case 'MOT_REFUSE': {
+      // le mot reste dans la ligne (le joueur peut le corriger) et ne compte pas comme un essai
+      return {
+        ...etat,
+        verification: false,
+        message: action.message,
+        messageErreur: true,
+        nbRefus: etat.nbRefus + 1,
+      }
     }
 
     case 'VALIDER': {
@@ -58,6 +92,9 @@ export function reducteurPartie(etat, action) {
         resultats: nouveauxResultats,
         propositionEnCours: '',
         statut: nouveauStatut,
+        verification: false,
+        message: action.message || '',
+        messageErreur: false,
       }
     }
 

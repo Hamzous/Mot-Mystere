@@ -67,3 +67,35 @@ describe('calculerPoints', () => {
     expect(calculerPoints('perdu', 6)).toBe(0)
   })
 })
+
+describe('vérification du dictionnaire', () => {
+  it('bloque la saisie pendant la vérification', () => {
+    let etat = taperMot(creerEtatInitial('ARBRE'), 'ABCDE')
+    etat = reducteurPartie(etat, { type: 'DEBUT_VERIFICATION' })
+    etat = reducteurPartie(etat, { type: 'EFFACER_LETTRE' })
+    expect(etat.propositionEnCours).toBe('ABCDE')
+  })
+
+  it('un mot refusé ne compte pas comme un essai', () => {
+    let etat = taperMot(creerEtatInitial('ARBRE'), 'ABCDE')
+    etat = reducteurPartie(etat, { type: 'DEBUT_VERIFICATION' })
+    etat = reducteurPartie(etat, { type: 'MOT_REFUSE', message: 'refusé' })
+    expect(etat.essais.length).toBe(0)
+    expect(etat.propositionEnCours).toBe('ABCDE')
+    expect(etat.nbRefus).toBe(1)
+    expect(etat.verification).toBe(false)
+  })
+
+  it('ne lance pas deux vérifications en même temps', () => {
+    let etat = taperMot(creerEtatInitial('ARBRE'), 'ABCDE')
+    const premiere = reducteurPartie(etat, { type: 'DEBUT_VERIFICATION' })
+    const seconde = reducteurPartie(premiere, { type: 'DEBUT_VERIFICATION' })
+    expect(seconde).toBe(premiere)
+  })
+
+  it('ne démarre pas la vérification sur une ligne incomplète', () => {
+    let etat = taperMot(creerEtatInitial('ARBRE'), 'AB')
+    etat = reducteurPartie(etat, { type: 'DEBUT_VERIFICATION' })
+    expect(etat.verification).toBe(false)
+  })
+})
