@@ -1,0 +1,41 @@
+:root {
+  --duree-retournement: 0.6s;
+  --decalage-case: 0.3s;
+  --duree-tremblement: 0.4s;
+}
+
+/* Couleur finale de chaque case, utilisée à la moitié du retournement */
+.case.vert  { --fin: var(--vert); }
+.case.jaune { --fin: var(--jaune); }
+.case.gris  { --fin: var(--gris); }
+
+/* --indice = position de la case dans la ligne (0 à 4) : chaque case démarre un peu après la précédente */
+.case.retourne {
+  animation: retourner var(--duree-retournement) ease both;
+  animation-delay: calc(var(--indice) * var(--decalage-case));
+}
+
+/* La case se couche (90°), change de couleur à ce moment-là, puis se relève */
+@keyframes retourner {
+  0%   { transform: rotateX(0);     background: var(--fond-doux); border-color: var(--bordure); }
+  49%  { transform: rotateX(90deg); background: var(--fond-doux); border-color: var(--bordure); }
+  50%  { transform: rotateX(90deg); background: var(--fin);       border-color: var(--fin); }
+  100% { transform: rotateX(0);     background: var(--fin);       border-color: var(--fin); }
+}
+
+/* Mot refusé : la ligne tremble et les bordures passent en rouge */
+.ligne.refusee {
+  animation: trembler var(--duree-tremblement) ease;
+}
+
+.ligne.refusee .case {
+  border-color: var(--erreur-texte);
+}
+
+@keyframes trembler {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-6px); }
+  80%      { transform: translateX(6px); }
+}

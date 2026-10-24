@@ -15,10 +15,13 @@ function Ligne(props) {
       couleur = props.couleurs[i]
     }
 
-    cases.push(<Case key={i} lettre={lettre} couleur={couleur} />)
+    cases.push(<Case key={i} lettre={lettre} couleur={couleur} indice={i} />)
   }
 
-  return <div className="ligne">{cases}</div>
+  // "refusee" : le mot a été refusé, la ligne tremble
+  const classes = props.refusee ? 'ligne refusee' : 'ligne'
+
+  return <div className={classes}>{cases}</div>
 }
 
 export default Ligne
