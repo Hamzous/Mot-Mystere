@@ -4,11 +4,13 @@ import Grille from '../components/Grille'
 import { reducteurPartie, creerEtatInitial, LONGUEUR_MOT } from '../game/reducteurPartie'
 import { tirerMotMystere } from '../game/motMystere'
 import { calculerPoints } from '../game/score'
-import { verifierMot , lienWiktionnaire} from '../api/wiktionary'
 import { estDansLaListe } from '../game/dictionnaireLocal'
+import { verifierMot, lienWiktionnaire } from '../api/wiktionary'
+import { lirePseudo, enregistrerPartie } from '../storage/storage'
 
 function Game() {
-  const [etat, dispatch] = useReducer(reducteurPartie, null, () =>{
+  // Le 3e paramètre est exécuté une seule fois, au démarrage : il tire le mot
+  const [etat, dispatch] = useReducer(reducteurPartie, null, () => {
     const tirage = tirerMotMystere()
     return creerEtatInitial(tirage.mot, tirage.motAffiche)
   })
@@ -31,7 +33,7 @@ function Game() {
 
       if (resultat === 'invalide') {
         dispatch({ type: 'MOT_REFUSE', message: "Ce mot n'est pas dans le dictionnaire" })
-            } else if (resultat === 'erreur') {
+      } else if (resultat === 'erreur') {
         // API injoignable : on vérifie avec la liste locale à la place
         if (estDansLaListe(etat.propositionEnCours)) {
           dispatch({
@@ -65,8 +67,24 @@ function Game() {
     }
 
     window.addEventListener('keydown', surTouche)
+    // nettoyage : on retire l'écouteur avant d'en ajouter un nouveau
     return () => window.removeEventListener('keydown', surTouche)
   }, [etat])
+
+  // Quand la partie se termine, on l'enregistre une seule fois
+  useEffect(() => {
+    if (etat.statut === 'en_cours') {
+      return
+    }
+    enregistrerPartie({
+      pseudo: lirePseudo() || 'Anonyme',
+      mot: etat.motAffiche,
+      essais: etat.essais.length,
+      points: calculerPoints(etat.statut, etat.essais.length),
+      statut: etat.statut,
+      date: new Date().toISOString(),
+    })
+  }, [etat.statut, etat.motAffiche, etat.essais.length])
 
   function rejouer() {
     const tirage = tirerMotMystere()
