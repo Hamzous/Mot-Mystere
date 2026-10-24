@@ -1,10 +1,11 @@
 import motsSolutions from '../data/mots_solutions.json'
 import { normaliser } from './normaliser'
 
-// Tire un mot au hasard dans la liste et le renvoie sans accents, en majuscules
+// Tire un mot au hasard et renvoie deux versions :
+// - mot : sans accents, en majuscules (pour jouer)
+// - motAffiche : tel qu'écrit dans la liste, avec ses accents (pour l'écran de fin)
 export function tirerMotMystere() {
-  // Math.random() donne un nombre entre 0 et 1 (jamais 1).
-  // Multiplié par la taille de la liste, puis arrondi vers le bas : on obtient un index valide.
   const index = Math.floor(Math.random() * motsSolutions.length)
-  return normaliser(motsSolutions[index])
+  const motAffiche = motsSolutions[index]
+  return { mot: normaliser(motAffiche), motAffiche: motAffiche }
 }

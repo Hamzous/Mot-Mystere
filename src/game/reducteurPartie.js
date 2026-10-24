@@ -4,9 +4,10 @@ export const LONGUEUR_MOT = 5
 export const ESSAIS_MAX = 6
 
 // L'état de départ d'une partie
-export function creerEtatInitial(motMystere) {
+export function creerEtatInitial(motMystere , motAffiche) {
   return {
     motMystere: motMystere,  // sans accents, en majuscules
+    motAffiche: motAffiche || motMystere, // tel qu'écrit dans la liste, avec ses accents
     essais: [],              // les mots déjà validés
     resultats: [],           // les couleurs de chaque mot validé
     propositionEnCours: '',  // la ligne en cours de saisie
@@ -99,7 +100,7 @@ export function reducteurPartie(etat, action) {
     }
 
     case 'NOUVELLE_PARTIE': {
-      return creerEtatInitial(action.motMystere)
+      return creerEtatInitial(action.motMystere , action.motAffiche)
     }
 
     default:

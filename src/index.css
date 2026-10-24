@@ -198,7 +198,7 @@ a:focus-visible {
 }
 
 /* le 2e paragraphe = les points, mis en avant */
-.fin-partie p:nth-of-type(2) {
+.fin-partie .points {
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--vert-fonce);

@@ -4,13 +4,14 @@ import Grille from '../components/Grille'
 import { reducteurPartie, creerEtatInitial, LONGUEUR_MOT } from '../game/reducteurPartie'
 import { tirerMotMystere } from '../game/motMystere'
 import { calculerPoints } from '../game/score'
-import { verifierMot } from '../api/wiktionary'
+import { verifierMot , lienWiktionnaire} from '../api/wiktionary'
 import { estDansLaListe } from '../game/dictionnaireLocal'
 
 function Game() {
-  const [etat, dispatch] = useReducer(reducteurPartie, null, () =>
-    creerEtatInitial(tirerMotMystere())
-  )
+  const [etat, dispatch] = useReducer(reducteurPartie, null, () =>{
+    const tirage = tirerMotMystere()
+    return creerEtatInitial(tirage.mot, tirage.motAffiche)
+  })
 
   // On écoute le clavier. L'effet dépend de "etat" : à chaque changement d'état,
   // l'ancien écouteur est retiré et un nouveau est ajouté. Comme ça, l'écouteur
@@ -68,7 +69,8 @@ function Game() {
   }, [etat])
 
   function rejouer() {
-    dispatch({ type: 'NOUVELLE_PARTIE', motMystere: tirerMotMystere() })
+    const tirage = tirerMotMystere()
+    dispatch({ type: 'NOUVELLE_PARTIE', motMystere: tirage.mot, motAffiche: tirage.motAffiche })
   }
 
   const partieFinie = etat.statut !== 'en_cours'
@@ -90,14 +92,16 @@ function Game() {
 
       {partieFinie && (
         <div className="fin-partie">
-          {etat.statut === 'gagne' ? (
-            <p>Bravo ! Tu as trouvé le mot.</p>
-          ) : (
-            <p>Perdu... Le mot était : {etat.motMystere}</p>
-          )}
-          <p>Points : {calculerPoints(etat.statut, etat.essais.length)}</p>
+          <p>{etat.statut === 'gagne' ? 'Bravo ! Tu as trouvé le mot.' : 'Perdu...'}</p>
+          <p>
+            Le mot était : <strong>{etat.motAffiche}</strong>
+          </p>
+          <p className="points">Points : {calculerPoints(etat.statut, etat.essais.length)}</p>
           <button onClick={rejouer}>Nouvelle partie</button>
           <Link to="/">Retour à l'accueil</Link>
+          <a href={lienWiktionnaire(etat.motAffiche)} target="_blank" rel="noreferrer">
+            Voir sur le Wiktionnaire
+          </a>
         </div>
       )}
     </div>

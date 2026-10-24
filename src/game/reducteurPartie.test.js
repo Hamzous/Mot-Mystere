@@ -98,4 +98,11 @@ describe('vérification du dictionnaire', () => {
     etat = reducteurPartie(etat, { type: 'DEBUT_VERIFICATION' })
     expect(etat.verification).toBe(false)
   })
+describe('mot affiché', () => {
+  it('garde le mot avec ses accents pour l\'écran de fin', () => {
+    const etat = creerEtatInitial('ECOLE', 'école')
+    expect(etat.motMystere).toBe('ECOLE')
+    expect(etat.motAffiche).toBe('école')
+  })
+})
 })
