@@ -5,6 +5,7 @@ import { reducteurPartie, creerEtatInitial, LONGUEUR_MOT } from '../game/reducte
 import { tirerMotMystere } from '../game/motMystere'
 import { calculerPoints } from '../game/score'
 import { verifierMot } from '../api/wiktionary'
+import { estDansLaListe } from '../game/dictionnaireLocal'
 
 function Game() {
   const [etat, dispatch] = useReducer(reducteurPartie, null, () =>
@@ -29,12 +30,19 @@ function Game() {
 
       if (resultat === 'invalide') {
         dispatch({ type: 'MOT_REFUSE', message: "Ce mot n'est pas dans le dictionnaire" })
-      } else if (resultat === 'erreur') {
-        // API injoignable : on accepte le mot pour ne pas bloquer la partie
-        dispatch({
-          type: 'VALIDER',
-          message: 'Dictionnaire indisponible : mot accepté sans vérification',
-        })
+            } else if (resultat === 'erreur') {
+        // API injoignable : on vérifie avec la liste locale à la place
+        if (estDansLaListe(etat.propositionEnCours)) {
+          dispatch({
+            type: 'VALIDER',
+            message: 'Dictionnaire indisponible : mot vérifié avec la liste locale',
+          })
+        } else {
+          dispatch({
+            type: 'MOT_REFUSE',
+            message: "Dictionnaire indisponible : ce mot n'est pas dans la liste locale",
+          })
+        }
       } else {
         dispatch({ type: 'VALIDER' })
       }
