@@ -12,6 +12,7 @@ const DELAI_MAX = 6000 // 6 secondes, ensuite on considère que l'API ne répond
 // Mémoire : un mot déjà vérifié n'est pas redemandé à l'API
 const memoire = new Map()
 
+
 // Fait une requête à l'API et renvoie la réponse en objet JavaScript
 async function appeler(parametres) {
   const adresse =
@@ -99,4 +100,8 @@ export async function verifierMot(mot) {
     // on ne mémorise pas une erreur : la prochaine fois on réessaie
     return 'erreur'
   }
+}
+// Adresse de la page d'un mot sur le Wiktionnaire (encodeURIComponent gère les accents)
+export function lienWiktionnaire(mot) {
+  return 'https://fr.wiktionary.org/wiki/' + encodeURIComponent(mot)
 }
