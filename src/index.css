@@ -366,3 +366,46 @@ a:focus-visible {
     padding: 28px 16px;
   }
 }
+/* ---------- Clavier à l'écran ---------- */
+.clavier {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 520px;
+  margin: 24px auto 0;
+}
+
+.rangee-clavier {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.touche {
+  flex: 1;
+  min-width: 0;
+  max-width: 44px;
+  height: 52px;
+  padding: 0;
+  font-size: 1rem;
+  color: var(--texte);
+  background: var(--bordure);
+  border-radius: 6px;
+  box-shadow: 0 2px 0 #1c1730;
+}
+
+.touche.large {
+  flex: 1.6;
+  max-width: 72px;
+  font-size: 0.8rem;
+}
+
+/* .touche.vert (2 classes) passe devant .vert de grille.css */
+.touche.vert { background: var(--vert); box-shadow: 0 2px 0 #3d6a39; color: white; }
+.touche.jaune { background: var(--jaune); box-shadow: 0 2px 0 #86752a; color: white; }
+.touche.gris { background: var(--fond); box-shadow: none; color: var(--texte-doux); opacity: 0.6; }
+
+.touche:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
