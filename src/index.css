@@ -253,3 +253,23 @@ a:focus-visible {
     padding: 28px 16px;
   }
 }
+
+.tableau-scores {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+  background: var(--carte);
+  border-radius: 12px;
+  box-shadow: var(--ombre);
+  overflow: hidden;
+}
+
+.tableau-scores th,
+.tableau-scores td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--bordure);
+}
+
+.tableau-scores th {
+  background: #eef1f3;
+}

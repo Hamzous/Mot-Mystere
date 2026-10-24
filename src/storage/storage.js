@@ -12,3 +12,30 @@ export function lirePseudo() {
 export function enregistrerPseudo(pseudo) {
   localStorage.setItem('pseudo', pseudo)
 }
+
+const CLE_SCORES = 'scores'
+
+// Lit la liste des parties enregistrées.
+// Si rien n'est enregistré, ou si le texte est illisible, on renvoie une liste vide.
+export function lireScores() {
+  try {
+    const texte = localStorage.getItem(CLE_SCORES)
+    if (texte === null) {
+      return []
+    }
+    const liste = JSON.parse(texte)
+    if (Array.isArray(liste)) {
+      return liste
+    }
+    return []
+  } catch {
+    return []
+  }
+}
+
+// Ajoute une partie terminée à la liste
+export function enregistrerPartie(partie) {
+  const scores = lireScores()
+  scores.push(partie)
+  localStorage.setItem(CLE_SCORES, JSON.stringify(scores))
+}
