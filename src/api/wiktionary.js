@@ -1,26 +1,25 @@
 import { normaliser } from '../game/normaliser'
+import {
+  API_WIKTIONNAIRE,
+  PAGE_WIKTIONNAIRE,
+  USER_AGENT_API,
+  DELAI_API_MS,
+} from '../config'
 
-const URL_API = 'https://fr.wiktionary.org/w/api.php'
-
-// Wikimedia demande de s'identifier : mets ton nom de projet et un contact
-const ENTETES = {
-  'Api-User-Agent': 'LeMotMystere/1.0 (projet scolaire; contact: ton-email@exemple.fr)',
-}
-
-const DELAI_MAX = 6000 // 6 secondes, ensuite on considère que l'API ne répond pas
+// Wikimedia demande de s'identifier (valeur définie dans le fichier .env)
+const ENTETES = { 'Api-User-Agent': USER_AGENT_API }
 
 // Mémoire : un mot déjà vérifié n'est pas redemandé à l'API
 const memoire = new Map()
 
-
 // Fait une requête à l'API et renvoie la réponse en objet JavaScript
 async function appeler(parametres) {
   const adresse =
-    URL_API + '?' + new URLSearchParams({ ...parametres, format: 'json', origin: '*' })
+    API_WIKTIONNAIRE + '?' + new URLSearchParams({ ...parametres, format: 'json', origin: '*' })
 
   // AbortController permet d'annuler la requête si elle est trop longue
   const controleur = new AbortController()
-  const minuteur = setTimeout(() => controleur.abort(), DELAI_MAX)
+  const minuteur = setTimeout(() => controleur.abort(), DELAI_API_MS)
 
   try {
     const reponse = await fetch(adresse, { headers: ENTETES, signal: controleur.signal })
@@ -38,7 +37,7 @@ function estCategorieFrancaise(titre) {
   if (titre === 'Catégorie:Lemmes en français') {
     return true
   }
-  // ex : "Catégorie:Formes de noms communs en français", "Catégorie:Formes de verbes en français"
+  // ex : "Catégorie:Formes de noms communs en français"
   return titre.startsWith('Catégorie:Formes de ') && titre.endsWith(' en français')
 }
 
@@ -52,11 +51,9 @@ async function chercherMot(mot) {
     namespace: '0',
   })
 
-  // recherche[1] = la liste des titres trouvés
-  const titres = recherche[1]
-
   // On garde les titres qui, sans accents, sont égaux au mot tapé.
   // On exclut ceux qui ont une majuscule (noms propres comme "Paris").
+  const titres = recherche[1]
   const candidats = titres.filter(
     (titre) => normaliser(titre) === mot && titre === titre.toLowerCase()
   )
@@ -103,5 +100,5 @@ export async function verifierMot(mot) {
 }
 // Adresse de la page d'un mot sur le Wiktionnaire (encodeURIComponent gère les accents)
 export function lienWiktionnaire(mot) {
-  return 'https://fr.wiktionary.org/wiki/' + encodeURIComponent(mot)
+  return PAGE_WIKTIONNAIRE + encodeURIComponent(mot)
 }

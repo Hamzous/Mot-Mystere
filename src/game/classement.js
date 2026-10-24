@@ -1,6 +1,7 @@
+import { TAILLE_CLASSEMENT } from '../config'
 // Renvoie les meilleures parties : seulement les parties gagnées,
 // classées par points décroissants, puis par date (la plus ancienne d'abord).
-export function meilleuresParties(parties, nombre = 10) {
+export function meilleuresParties(parties, nombre = TAILLE_CLASSEMENT) {
   const gagnees = parties.filter((partie) => partie.statut === 'gagne')
 
   gagnees.sort((a, b) => {

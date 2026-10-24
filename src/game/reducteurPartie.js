@@ -1,7 +1,8 @@
 import { evaluerProposition } from './evaluerProposition'
+import { LONGUEUR_MOT, ESSAIS_MAX } from '../config'
 
-export const LONGUEUR_MOT = 5
-export const ESSAIS_MAX = 6
+// On les réexporte pour que Grille.jsx et Ligne.jsx (qui les importent d'ici) n'aient rien à changer
+export { LONGUEUR_MOT, ESSAIS_MAX }
 
 // L'état de départ d'une partie
 export function creerEtatInitial(motMystere , motAffiche) {

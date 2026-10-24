@@ -1,3 +1,5 @@
+import { ESSAIS_MAX } from '../config'
+
 // Calcule les statistiques à partir d'une liste de parties (celles d'un seul joueur)
 export function calculerStats(parties) {
   // On range les parties de la plus ancienne à la plus récente (pour les séries)
@@ -10,8 +12,8 @@ export function calculerStats(parties) {
   let meilleureSerie = 0
 
   // repartition[0] = victoires en 1 essai, repartition[5] = victoires en 6 essais
-  const repartition = [0, 0, 0, 0, 0, 0]
-
+  const repartition = new Array(ESSAIS_MAX).fill(0)
+  
   for (const partie of triees) {
     totalPoints += partie.points
 
