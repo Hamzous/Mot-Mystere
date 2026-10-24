@@ -1,15 +1,32 @@
 /* ---------- Couleurs et réglages communs ---------- */
 :root {
-  --vert: #6aaa64;
-  --vert-fonce: #538d4e;
-  --jaune: #c9b458;
-  --gris: #787c7e;
-  --fond: #f4f6f8;
-  --carte: #ffffff;
-  --texte: #1a1a1b;
-  --texte-doux: #5c6168;
-  --bordure: #d9dde1;
-  --ombre: 0 4px 24px rgba(20, 30, 40, 0.08);
+  color-scheme: dark;
+
+  /* Thème noir et violet */
+  --fond: #0d0b14;
+  --fond-doux: #15111f;
+  --carte: #1b1629;
+  --bordure: #2f2745;
+  --texte: #ece9f5;
+  --texte-doux: #a69fbd;
+  --violet: #8b5cf6;
+  --violet-fonce: #6d3fe0;
+  --violet-ombre: #4a2aa8;
+  --violet-clair: #c4b5fd;
+  --ombre: 0 8px 32px rgba(139, 92, 246, 0.14);
+
+  /* Couleurs du jeu (utilisées par grille.css) */
+  --vert: #538d4e;
+  --jaune: #b59f3b;
+  --gris: #3a3a4c;
+
+  /* Messages */
+  --alerte-fond: #2a2410;
+  --alerte-texte: #f0d98a;
+  --alerte-bordure: #5a4a14;
+  --erreur-fond: #2c1420;
+  --erreur-texte: #f5a3b5;
+  --erreur-bordure: #6b2437;
 }
 
 * {
@@ -23,10 +40,10 @@ body {
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--texte);
   text-align: center;
-  /* deux taches de couleur douces dans les coins, par-dessus le fond gris clair */
+  /* deux halos violets dans les coins, sur fond noir */
   background:
-    radial-gradient(circle at 10% 0%, rgba(106, 170, 100, 0.18), transparent 40%),
-    radial-gradient(circle at 90% 100%, rgba(201, 180, 88, 0.2), transparent 40%),
+    radial-gradient(circle at 10% 0%, rgba(139, 92, 246, 0.22), transparent 45%),
+    radial-gradient(circle at 90% 100%, rgba(192, 132, 252, 0.14), transparent 45%),
     var(--fond);
   background-attachment: fixed;
 }
@@ -44,11 +61,17 @@ h1 {
   font-weight: 800;
   letter-spacing: 3px;
   text-transform: uppercase;
-  /* texte rempli par un dégradé vert vers jaune */
-  background: linear-gradient(90deg, var(--vert-fonce), var(--jaune));
+  /* texte rempli par un dégradé de violets */
+  background: linear-gradient(90deg, var(--violet-clair), var(--violet), #e879f9);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+h2 {
+  margin: 28px 0 12px;
+  font-size: 1.1rem;
+  color: var(--violet-clair);
 }
 
 p {
@@ -57,8 +80,12 @@ p {
   color: var(--texte-doux);
 }
 
+strong {
+  color: var(--texte);
+}
+
 a {
-  color: var(--vert-fonce);
+  color: var(--violet-clair);
   font-weight: 600;
   text-decoration: none;
 }
@@ -69,37 +96,38 @@ button {
   font: inherit;
   font-weight: 700;
   color: white;
-  background: var(--vert);
+  background: var(--violet);
   border: none;
   border-radius: 10px;
   /* l'ombre pleine donne un effet de touche de clavier */
-  box-shadow: 0 3px 0 var(--vert-fonce);
+  box-shadow: 0 3px 0 var(--violet-ombre);
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
+  transition: transform 0.1s, box-shadow 0.1s, filter 0.2s;
 }
 
 button:hover {
-  background: #5fa058;
+  filter: brightness(1.12);
 }
 
 button:active {
   transform: translateY(3px);
-  box-shadow: 0 0 0 var(--vert-fonce);
+  box-shadow: 0 0 0 var(--violet-ombre);
 }
 
-/* utile au palier 2 : bouton bloqué pendant la vérification */
+/* bouton bloqué pendant la vérification du mot */
 button:disabled {
   background: var(--gris);
-  box-shadow: 0 3px 0 #5e6264;
-  opacity: 0.8;
+  box-shadow: 0 3px 0 #26262f;
+  opacity: 0.7;
   cursor: not-allowed;
+  filter: none;
 }
 
 /* anneau visible quand on navigue au clavier */
 button:focus-visible,
 input:focus-visible,
 a:focus-visible {
-  outline: 3px solid rgba(106, 170, 100, 0.5);
+  outline: 3px solid rgba(196, 181, 253, 0.55);
   outline-offset: 2px;
 }
 
@@ -110,6 +138,28 @@ a:focus-visible {
   border: 1px solid var(--bordure);
   border-radius: 20px;
   box-shadow: var(--ombre);
+}
+
+/* ---------- Liens en forme de pastille ---------- */
+.liens-accueil a,
+.fin-partie a,
+.page-scores > a,
+.page-stats > a {
+  display: inline-block;
+  padding: 8px 18px;
+  color: var(--texte);
+  background: var(--fond-doux);
+  border: 2px solid var(--bordure);
+  border-radius: 999px;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.liens-accueil a:hover,
+.fin-partie a:hover,
+.page-scores > a:hover,
+.page-stats > a:hover {
+  border-color: var(--violet);
+  transform: translateY(-2px);
 }
 
 /* ---------- Page d'accueil ---------- */
@@ -133,15 +183,19 @@ a:focus-visible {
   padding: 12px 14px;
   font: inherit;
   color: var(--texte);
-  background: #fbfcfc;
+  background: var(--fond-doux);
   border: 2px solid var(--bordure);
   border-radius: 10px;
   transition: border-color 0.2s;
 }
 
+.page-accueil input::placeholder {
+  color: var(--texte-doux);
+}
+
 .page-accueil input:focus {
   outline: none;
-  border-color: var(--vert);
+  border-color: var(--violet);
 }
 
 .liens-accueil {
@@ -150,22 +204,6 @@ a:focus-visible {
   gap: 10px;
   justify-content: center;
   margin-top: 32px;
-}
-
-.liens-accueil a,
-.fin-partie a {
-  padding: 8px 18px;
-  color: var(--texte);
-  background: white;
-  border: 2px solid var(--bordure);
-  border-radius: 999px;
-  transition: transform 0.15s, border-color 0.15s;
-}
-
-.liens-accueil a:hover,
-.fin-partie a:hover {
-  border-color: var(--vert);
-  transform: translateY(-2px);
 }
 
 /* ---------- Page de jeu ---------- */
@@ -197,30 +235,105 @@ a:focus-visible {
   color: var(--texte);
 }
 
-/* le 2e paragraphe = les points, mis en avant */
 .fin-partie .points {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--vert-fonce);
+  color: var(--violet-clair);
 }
 
-/* ---------- Messages (prévus pour le palier 2) ---------- */
+/* ---------- Messages (mot refusé, vérification, API indisponible) ---------- */
 .message {
-  max-width: 360px;
+  max-width: 380px;
   margin: 12px auto;
   padding: 10px 16px;
   font-weight: 600;
-  color: #6b5a14;
-  background: #fff7dd;
-  border: 1px solid #ecdc9a;
+  color: var(--alerte-texte);
+  background: var(--alerte-fond);
+  border: 1px solid var(--alerte-bordure);
   border-radius: 10px;
   animation: pop 0.25s ease both;
 }
 
 .message.erreur {
-  color: #8c2323;
-  background: #fde8e8;
-  border-color: #f3b8b8;
+  color: var(--erreur-texte);
+  background: var(--erreur-fond);
+  border-color: var(--erreur-bordure);
+}
+
+/* ---------- Tableau des scores ---------- */
+.tableau-scores {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+  background: var(--carte);
+  border-radius: 12px;
+  box-shadow: var(--ombre);
+  overflow: hidden;
+}
+
+.tableau-scores th,
+.tableau-scores td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--bordure);
+}
+
+.tableau-scores th {
+  color: var(--violet-clair);
+  background: var(--fond-doux);
+}
+
+.tableau-scores tbody tr:hover {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+/* ---------- Statistiques ---------- */
+.grille-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.stat {
+  padding: 16px 8px;
+  color: var(--texte-doux);
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  box-shadow: var(--ombre);
+}
+
+.stat .valeur {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--violet-clair);
+}
+
+.repartition {
+  margin-bottom: 24px;
+}
+
+.ligne-repartition {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.ligne-repartition .essai {
+  width: 16px;
+  font-weight: 700;
+}
+
+.barre {
+  min-width: 28px;
+  padding: 4px 8px;
+  text-align: right;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(90deg, var(--violet-fonce), var(--violet));
+  border-radius: 6px;
 }
 
 /* ---------- Animations ---------- */
@@ -252,77 +365,4 @@ a:focus-visible {
   .page-accueil {
     padding: 28px 16px;
   }
-}
-
-.tableau-scores {
-  width: 100%;
-  margin: 20px 0;
-  border-collapse: collapse;
-  background: var(--carte);
-  border-radius: 12px;
-  box-shadow: var(--ombre);
-  overflow: hidden;
-}
-
-.tableau-scores th,
-.tableau-scores td {
-  padding: 10px 8px;
-  border-bottom: 1px solid var(--bordure);
-}
-
-.tableau-scores th {
-  background: #eef1f3;
-}
-.grille-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 12px;
-  margin: 20px 0;
-}
-
-.stat {
-  padding: 16px 8px;
-  background: var(--carte);
-  border: 1px solid var(--bordure);
-  border-radius: 12px;
-  box-shadow: var(--ombre);
-  color: var(--texte-doux);
-}
-
-.stat .valeur {
-  display: block;
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--texte);
-}
-
-.page-stats h2 {
-  margin: 28px 0 12px;
-  font-size: 1.1rem;
-}
-
-.repartition {
-  margin-bottom: 24px;
-}
-
-.ligne-repartition {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.ligne-repartition .essai {
-  width: 16px;
-  font-weight: 700;
-}
-
-.barre {
-  min-width: 28px;
-  padding: 4px 8px;
-  text-align: right;
-  font-weight: 700;
-  color: white;
-  background: var(--vert);
-  border-radius: 6px;
 }
