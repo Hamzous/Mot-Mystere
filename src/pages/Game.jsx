@@ -1,9 +1,11 @@
-import { useReducer, useEffect } from 'react'
+import { useReducer, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import Grille from '../components/Grille'
+import Keyboard from '../components/Keyboard'
 import { reducteurPartie, creerEtatInitial, LONGUEUR_MOT } from '../game/reducteurPartie'
 import { tirerMotMystere } from '../game/motMystere'
 import { calculerPoints } from '../game/score'
+import { etatsLettres } from '../game/clavier'
 import { estDansLaListe } from '../game/dictionnaireLocal'
 import { verifierMot, lienWiktionnaire } from '../api/wiktionary'
 import { lirePseudo, enregistrerPartie } from '../storage/storage'
@@ -15,12 +17,20 @@ function Game() {
     return creerEtatInitial(tirage.mot, tirage.motAffiche)
   })
 
-  // On écoute le clavier. L'effet dépend de "etat" : à chaque changement d'état,
-  // l'ancien écouteur est retiré et un nouveau est ajouté. Comme ça, l'écouteur
-  // lit toujours l'état à jour (sinon il garderait une version périmée).
-  useEffect(() => {
-    // Vérifie le mot auprès du Wiktionnaire, puis valide ou refuse
-    async function valider() {
+  // Une touche, qu'elle vienne du vrai clavier ou du clavier à l'écran.
+  // touche = une lettre ('A'), 'ENTREE' ou 'EFFACER'
+  const traiterTouche = useCallback(
+    async (touche) => {
+      if (touche === 'EFFACER') {
+        dispatch({ type: 'EFFACER_LETTRE' })
+        return
+      }
+      if (touche !== 'ENTREE') {
+        dispatch({ type: 'AJOUTER_LETTRE', lettre: touche })
+        return
+      }
+
+      // Entrée : on vérifie le mot auprès du Wiktionnaire, puis on valide ou on refuse
       if (etat.verification || etat.statut !== 'en_cours') {
         return
       }
@@ -49,27 +59,32 @@ function Game() {
       } else {
         dispatch({ type: 'VALIDER' })
       }
-    }
+    },
+    [etat]
+  )
 
-    function surTouche(evenement) {
+  // On écoute le vrai clavier. L'effet se relance quand traiterTouche change (donc quand
+  // l'état change) : l'écouteur lit ainsi toujours l'état à jour.
+  useEffect(() => {
+    function surClavier(evenement) {
       // on ignore les raccourcis (Ctrl+R, Cmd+C...)
       if (evenement.ctrlKey || evenement.metaKey || evenement.altKey) {
         return
       }
 
       if (evenement.key === 'Enter') {
-        valider()
+        traiterTouche('ENTREE')
       } else if (evenement.key === 'Backspace') {
-        dispatch({ type: 'EFFACER_LETTRE' })
+        traiterTouche('EFFACER')
       } else if (/^[a-zA-Z]$/.test(evenement.key)) {
-        dispatch({ type: 'AJOUTER_LETTRE', lettre: evenement.key.toUpperCase() })
+        traiterTouche(evenement.key.toUpperCase())
       }
     }
 
-    window.addEventListener('keydown', surTouche)
+    window.addEventListener('keydown', surClavier)
     // nettoyage : on retire l'écouteur avant d'en ajouter un nouveau
-    return () => window.removeEventListener('keydown', surTouche)
-  }, [etat])
+    return () => window.removeEventListener('keydown', surClavier)
+  }, [traiterTouche])
 
   // Quand la partie se termine, on l'enregistre une seule fois
   useEffect(() => {
@@ -107,6 +122,12 @@ function Game() {
       {etat.message && !etat.verification && (
         <p className={etat.messageErreur ? 'message erreur' : 'message'}>{etat.message}</p>
       )}
+
+      <Keyboard
+        etats={etatsLettres(etat.essais, etat.resultats)}
+        surTouche={traiterTouche}
+        desactive={etat.verification || partieFinie}
+      />
 
       {partieFinie && (
         <div className="fin-partie">
