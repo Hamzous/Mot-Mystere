@@ -22,8 +22,8 @@ Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propos
 | 1 | Le jeu | Terminé |
 | 2 | Le dictionnaire | Presque terminé (il manque les accents en fin de partie) |
 | 3 | Le confort de jeu | Terminé |
-| 4 | Le mot du jour | Presque terminé (déploiement et classement du jour en cours) |
-| 5 | Les variantes | Pas commencé |
+| 4 | Le mot du jour | Presque terminé (mise en ligne en cours) |
+| 5 | Les variantes | Commencé (mode difficile, filtre des scores) |
 | 6 | Les quatre grilles | Pas commencé |
 
 ### Palier 1 : le jeu (terminé)
@@ -65,12 +65,21 @@ Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propos
 - [x] Partage du résultat en emojis dans le presse-papiers
 - [x] Plus de 5 tests automatiques, dont 2 sur les lettres en double
 - [x] `vercel.json` : toutes les adresses renvoient `index.html`, pour que les routes marchent au rafraîchissement
-- [ ] Classement du jour : en cours
+- [x] Classement du jour (points, puis temps de résolution), distinct du classement général
 - [ ] Mise en ligne sur Vercel : en cours
 
-### Paliers 5 et 6
+### Palier 5 : les variantes (commencé)
 
-Pas commencés.
+- [x] Mode difficile : les lettres vertes restent à leur place, les lettres jaunes doivent être réutilisées, avec un message précis (« la lettre n°2 doit être R »)
+- [x] Points ×1,5 en mode difficile
+- [x] Réglage du mode difficile mémorisé dans le navigateur
+- [x] Scores filtrables par mode (tous, normal, difficile)
+- [ ] Mots de 6 et 7 lettres en partie libre (points ×1,5 et ×2)
+- [ ] Longueur du mot dans l'adresse et filtre des scores par longueur
+
+### Palier 6
+
+Pas commencé.
 
 ## Installer, lancer, tester
 
@@ -123,7 +132,8 @@ src/
 | `game/score.js` | nombre d'essais vers points |
 | `game/motMystere.js` | tire un mot au hasard dans la liste (avec et sans accents) |
 | `game/dictionnaireLocal.js` | liste de secours quand l'API ne répond pas |
-| `game/classement.js` | calcule les 10 meilleures parties |
+| `game/classement.js` | calcule les 10 meilleures parties, le classement du jour, et filtre par mode |
+| `game/modeDifficile.js` | vérifie qu'une proposition réutilise les indices (mode difficile) |
 | `game/statistiques.js` | calcule les statistiques d'un joueur |
 | `api/wiktionary.js` | vérifie qu'un mot est un mot français, construit le lien vers sa page |
 | `storage/storage.js` | pseudo et parties dans le localStorage |
@@ -155,6 +165,8 @@ Le simple critère « catégorie qui finit par *en français* » ne suffit pas, 
 
 **Quand l'API ne répond pas.** Le jeu n'est pas bloqué : le mot est vérifié dans la liste locale `mots_solutions.json` (environ 300 mots). S'il y est, il est accepté avec un message ; sinon il est refusé avec un message, sans compter comme un essai. Le mot mystère vient de cette liste, donc le joueur peut toujours gagner. On préfère refuser un vrai mot hors ligne plutôt que valider n'importe quel texte. Contrepartie : hors ligne, seuls les mots de la liste sont acceptés.
 
+**Mode difficile.** La vérification est une fonction pure (`verifierModeDifficile`) qui parcourt les essais déjà joués : une lettre verte doit rester à sa place, une lettre jaune doit être présente. Elle renvoie le message d'erreur à afficher, ou un texte vide. `Game.jsx` l'appelle avant le Wiktionnaire : un mot qui oublie un indice est refusé sans requête et ne compte pas comme un essai. Le mode ne s'applique qu'à la partie libre, pour que le mot du jour reste le même défi pour tout le monde. Les parties enregistrées avant l'ajout du mode n'ont pas le champ `difficile` : le filtre des scores les compte comme normales.
+
 **localStorage.** Le pseudo et la liste des parties terminées sont enregistrés dans le navigateur. Le classement et les statistiques ne sont pas stockés : ils sont calculés à l'affichage à partir de la liste des parties, ce qui évite d'avoir deux versions d'une même information. Deux parties à égalité de points sont départagées par la date, pour que l'ordre soit toujours le même. Les statistiques sont calculées par pseudo, donc plusieurs joueurs peuvent se partager un ordinateur.
 
 **Thème.** Interface noir et violet. Toutes les couleurs sont des variables CSS définies au début de `index.css`, pour pouvoir changer le thème à un seul endroit.
@@ -171,10 +183,10 @@ Le simple critère « catégorie qui finit par *en français* » ne suffit pas, 
 ## Répartition du travail
 
 - **Hamza** : logique du jeu (`game/`), tirage du mot, pseudo (`storage`, accueil), page de partie, appel au Wiktionnaire et liste de secours, scores et statistiques, clavier à l'écran, animations, écran des règles, mot du jour, compte à rebours, partage, configuration (`.env`), mise en forme générale (`index.css`).
-- **Mohamed** : routes React Router, composants `Grille`, `Ligne`, `Case` et leur CSS, configuration Vercel (`vercel.json`), mise à jour du README.
+- **Mohamed** : routes React Router, composants `Grille`, `Ligne`, `Case` et leur CSS, configuration Vercel (`vercel.json`), mode difficile (logique, tests, réglage, points), filtre des scores par mode, mise à jour du README.
 
 ## Suite prévue
 
 1. Finir le palier 2 : récupérer la liste de mots d'origine avec les accents, pour l'écran de fin.
-2. Finir le palier 4 : classement du jour et mise en ligne sur Vercel.
-3. Palier 5 : mots de 6 et 7 lettres, mode difficile.
+2. Finir le palier 4 : mise en ligne sur Vercel.
+3. Finir le palier 5 : mots de 6 et 7 lettres.
