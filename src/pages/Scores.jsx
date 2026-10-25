@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { lireScores } from '../storage/storage'
-import { meilleuresParties, classementDuJour } from '../game/classement'
+import { meilleuresParties, classementDuJour, filtrerParMode } from '../game/classement'
 import { dateParis, formaterDuree } from '../game/motDuJour'
 
 function Scores() {
@@ -9,8 +9,10 @@ function Scores() {
   const [parties] = useState(lireScores)
   const [jour] = useState(() => dateParis())
   const [onglet, setOnglet] = useState('jour')
+  const [filtreMode, setFiltreMode] = useState('tous')
 
-  const general = meilleuresParties(parties)
+  // on filtre d'abord, puis on garde les 10 meilleures
+  const general = meilleuresParties(filtrerParMode(parties, filtreMode))
   const duJour = classementDuJour(parties, jour)
 
   return (
@@ -68,6 +70,15 @@ function Scores() {
 
       {onglet === 'general' && (
         <>
+          <label className="filtre-scores">
+            Mode :
+            <select value={filtreMode} onChange={(e) => setFiltreMode(e.target.value)}>
+              <option value="tous">Tous</option>
+              <option value="normal">Normal</option>
+              <option value="difficile">Difficile</option>
+            </select>
+          </label>
+
           {general.length === 0 ? (
             <p>Aucune partie gagnée pour l'instant.</p>
           ) : (
@@ -79,6 +90,7 @@ function Scores() {
                   <th>Mot</th>
                   <th>Essais</th>
                   <th>Points</th>
+                  <th>Mode</th>
                   <th>Date</th>
                 </tr>
               </thead>
@@ -90,6 +102,7 @@ function Scores() {
                     <td>{partie.mot}</td>
                     <td>{partie.essais}</td>
                     <td>{partie.points}</td>
+                    <td>{partie.difficile ? 'Difficile' : 'Normal'}</td>
                     <td>{new Date(partie.date).toLocaleDateString('fr-FR')}</td>
                   </tr>
                 ))}
