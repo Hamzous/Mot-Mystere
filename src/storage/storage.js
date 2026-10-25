@@ -39,3 +39,43 @@ export function enregistrerPartie(partie) {
   scores.push(partie)
   localStorage.setItem(CLE_SCORES, JSON.stringify(scores))
 }
+const CLE_JOUR = 'partiesDuJour'
+
+// Lit ce qui est enregistré pour le mot du jour : { date: '2026-10-25', joueurs: { Hamza: {...} } }
+function lireStockJour() {
+  const vide = { date: '', joueurs: {} }
+  try {
+    const texte = localStorage.getItem(CLE_JOUR)
+    if (texte === null) {
+      return vide
+    }
+    const stock = JSON.parse(texte)
+    if (stock && typeof stock === 'object' && stock.joueurs && typeof stock.joueurs === 'object') {
+      return stock
+    }
+    return vide
+  } catch {
+    return vide
+  }
+}
+
+// La partie du jour d'un joueur, ou null s'il n'a pas commencé aujourd'hui
+export function lirePartieDuJour(date, pseudo) {
+  const stock = lireStockJour()
+  if (stock.date !== date) {
+    return null
+  }
+  return stock.joueurs[pseudo] || null
+}
+
+// Enregistre (ou complète) la partie du jour d'un joueur.
+// Si la date a changé, les sauvegardes de la veille sont supprimées.
+export function sauverPartieDuJour(date, pseudo, donnees) {
+  let stock = lireStockJour()
+  if (stock.date !== date) {
+    stock = { date: date, joueurs: {} }
+  }
+  // { ...ancien, ...nouveau } : on garde ce qui existait et on remplace ce qui change
+  stock.joueurs[pseudo] = { ...stock.joueurs[pseudo], ...donnees }
+  localStorage.setItem(CLE_JOUR, JSON.stringify(stock))
+}

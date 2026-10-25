@@ -409,3 +409,10 @@ a:focus-visible {
   transform: translateY(2px);
   box-shadow: none;
 }
+/* bouton "Mot du jour" : contour violet, sans remplissage */
+.bouton-secondaire {
+  color: var(--violet-clair);
+  background: transparent;
+  border: 2px solid var(--violet);
+  box-shadow: none;
+}
