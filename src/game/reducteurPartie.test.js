@@ -66,6 +66,12 @@ describe('calculerPoints', () => {
   it('donne 0 point quand la partie est perdue', () => {
     expect(calculerPoints('perdu', 6)).toBe(0)
   })
+
+  it('multiplie les points par 1,5 en mode difficile', () => {
+    expect(calculerPoints('gagne', 1, true)).toBe(900)
+    expect(calculerPoints('gagne', 6, true)).toBe(150)
+    expect(calculerPoints('perdu', 6, true)).toBe(0)
+  })
 })
 
 describe('vérification du dictionnaire', () => {
