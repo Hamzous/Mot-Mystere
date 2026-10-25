@@ -452,3 +452,25 @@ a:focus-visible {
   border-radius: 10px;
   resize: none;
 }
+
+/* ---------- Onglets des scores ---------- */
+.onglets {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.onglet {
+  padding: 8px 18px;
+  color: var(--texte-doux);
+  background: var(--fond-doux);
+  border: 2px solid var(--bordure);
+  box-shadow: none;
+}
+
+.onglet.actif {
+  color: white;
+  background: var(--violet);
+  border-color: var(--violet);
+}
