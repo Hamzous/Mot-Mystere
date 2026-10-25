@@ -1,21 +1,36 @@
-import { useReducer, useEffect, useCallback } from 'react'
+import { useState, useReducer, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import Grille from '../components/Grille'
 import Keyboard from '../components/Keyboard'
 import { reducteurPartie, creerEtatInitial, LONGUEUR_MOT } from '../game/reducteurPartie'
 import { tirerMotMystere } from '../game/motMystere'
+import { tirerMotDuJour } from '../game/motDuJour'
+import { creerEtatDuJour } from '../game/partieDuJour'
 import { calculerPoints } from '../game/score'
 import { etatsLettres } from '../game/clavier'
 import { estDansLaListe } from '../game/dictionnaireLocal'
 import { verifierMot, lienWiktionnaire } from '../api/wiktionary'
-import { lirePseudo, enregistrerPartie } from '../storage/storage'
+import {lirePseudo, enregistrerPartie, lirePartieDuJour, sauverPartieDuJour } from '../storage/storage'
 
-function Game() {
-  // Le 3e paramètre est exécuté une seule fois, au démarrage : il tire le mot
+function Game({ mode }) {
+  const modeJour = mode === 'jour'
+
+  // Lus une seule fois, à l'ouverture de la page
+  const [pseudo] = useState(() => lirePseudo() || 'Anonyme')
+  const [jour] = useState(() => (modeJour ? tirerMotDuJour() : null))
+  const [sauvegarde] = useState(() => (modeJour ? lirePartieDuJour(jour.date, pseudo) : null))
+
+  // Partie du jour : on reprend la sauvegarde. Partie libre : on tire un mot au hasard.
   const [etat, dispatch] = useReducer(reducteurPartie, null, () => {
+    if (modeJour) {
+      return creerEtatDuJour(jour, sauvegarde)
+    }
     const tirage = tirerMotMystere()
     return creerEtatInitial(tirage.mot, tirage.motAffiche)
   })
+
+  // true si la partie du jour était déjà terminée à l'ouverture : on ne l'enregistre pas deux fois
+  const [dejaTerminee] = useState(modeJour && etat.statut !== 'en_cours')
 
   // Une touche, qu'elle vienne du vrai clavier ou du clavier à l'écran.
   // touche = une lettre ('A'), 'ENTREE' ou 'EFFACER'
@@ -63,8 +78,7 @@ function Game() {
     [etat]
   )
 
-  // On écoute le vrai clavier. L'effet se relance quand traiterTouche change (donc quand
-  // l'état change) : l'écouteur lit ainsi toujours l'état à jour.
+  // On écoute le vrai clavier
   useEffect(() => {
     function surClavier(evenement) {
       // on ignore les raccourcis (Ctrl+R, Cmd+C...)
@@ -82,24 +96,53 @@ function Game() {
     }
 
     window.addEventListener('keydown', surClavier)
-    // nettoyage : on retire l'écouteur avant d'en ajouter un nouveau
     return () => window.removeEventListener('keydown', surClavier)
   }, [traiterTouche])
 
-  // Quand la partie se termine, on l'enregistre une seule fois
+  // Partie du jour : à chaque changement, on sauvegarde l'état (pour pouvoir le reprendre).
+  // "debut" est écrit la première fois seulement, puis conservé.
   useEffect(() => {
-    if (etat.statut === 'en_cours') {
+    if (!modeJour) {
       return
     }
+    const existante = lirePartieDuJour(jour.date, pseudo)
+    sauverPartieDuJour(jour.date, pseudo, {
+      mot: jour.mot,
+      debut: existante && existante.debut ? existante.debut : Date.now(),
+      essais: etat.essais,
+      resultats: etat.resultats,
+      propositionEnCours: etat.propositionEnCours,
+      statut: etat.statut,
+    })
+  }, [etat, modeJour, jour, pseudo])
+
+  // Quand la partie se termine, on l'enregistre une seule fois
+  useEffect(() => {
+    if (etat.statut === 'en_cours' || dejaTerminee) {
+      return
+    }
+
+    // durée de résolution (partie du jour seulement) : de la première ouverture à maintenant
+    let duree = null
+    if (modeJour) {
+      const sauvee = lirePartieDuJour(jour.date, pseudo)
+      if (sauvee && sauvee.debut) {
+        duree = Date.now() - sauvee.debut
+        sauverPartieDuJour(jour.date, pseudo, { duree: duree })
+      }
+    }
+
     enregistrerPartie({
-      pseudo: lirePseudo() || 'Anonyme',
+      pseudo: pseudo,
       mot: etat.motAffiche,
       essais: etat.essais.length,
       points: calculerPoints(etat.statut, etat.essais.length),
       statut: etat.statut,
       date: new Date().toISOString(),
+      mode: modeJour ? 'jour' : 'libre',
+      duree: duree,
     })
-  }, [etat.statut, etat.motAffiche, etat.essais.length])
+  }, [etat.statut, etat.motAffiche, etat.essais.length, dejaTerminee, modeJour, jour, pseudo])
 
   function rejouer() {
     const tirage = tirerMotMystere()
@@ -111,11 +154,14 @@ function Game() {
   return (
     <div className="page-jeu">
       <h1>Le Mot Mystère</h1>
+      {modeJour && <p>Mot du jour du {jour.date.split('-').reverse().join('/')}</p>}
 
       <Grille
         essais={etat.essais}
         resultats={etat.resultats}
         propositionEnCours={etat.propositionEnCours}
+        refusee={etat.messageErreur}
+        nbRefus={etat.nbRefus}
       />
 
       {etat.verification && <p className="message">Vérification du mot…</p>}
@@ -136,7 +182,13 @@ function Game() {
             Le mot était : <strong>{etat.motAffiche}</strong>
           </p>
           <p className="points">Points : {calculerPoints(etat.statut, etat.essais.length)}</p>
-          <button onClick={rejouer}>Nouvelle partie</button>
+
+          {modeJour ? (
+            <p>Reviens demain pour un nouveau mot !</p>
+          ) : (
+            <button onClick={rejouer}>Nouvelle partie</button>
+          )}
+
           <Link to="/">Retour à l'accueil</Link>
           <a href={lienWiktionnaire(etat.motAffiche)} target="_blank" rel="noreferrer">
             Voir sur le Wiktionnaire
