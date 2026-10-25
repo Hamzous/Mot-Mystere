@@ -1,13 +1,25 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { lirePseudo, enregistrerPseudo } from '../storage/storage'
+import {
+  lirePseudo,
+  enregistrerPseudo,
+  lireModeDifficile,
+  enregistrerModeDifficile,
+} from '../storage/storage'
 import { LONGUEUR_MOT, ESSAIS_MAX } from '../config'
 import CompteARebours from '../components/CompteARebours'
 
 function Home() {
   // Le pseudo affiché dans le champ. Au départ, on reprend celui déjà enregistré.
   const [pseudo, setPseudo] = useState(lirePseudo)
+  const [difficile, setDifficile] = useState(lireModeDifficile)
   const navigate = useNavigate()
+
+  // La case est enregistrée tout de suite : le réglage est gardé pour les prochaines visites
+  function changerDifficile(evenement) {
+    setDifficile(evenement.target.checked)
+    enregistrerModeDifficile(evenement.target.checked)
+  }
 
   // destination : '/jeu' (partie libre) ou '/jour' (mot du jour)
   function lancer(destination) {
@@ -42,6 +54,10 @@ function Home() {
         <button type="button" className="bouton-secondaire" onClick={() => lancer('/jour')}>
           Mot du jour
         </button>
+        <label className="option-difficile">
+          <input type="checkbox" checked={difficile} onChange={changerDifficile} />
+          Mode difficile (partie libre, points ×1,5)
+        </label>
       </form>
 
       <CompteARebours />

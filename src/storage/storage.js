@@ -13,6 +13,15 @@ export function enregistrerPseudo(pseudo) {
   localStorage.setItem('pseudo', pseudo)
 }
 
+// Mode difficile coché ou non (localStorage ne stocke que du texte : 'oui' ou 'non')
+export function lireModeDifficile() {
+  return localStorage.getItem('modeDifficile') === 'oui'
+}
+
+export function enregistrerModeDifficile(difficile) {
+  localStorage.setItem('modeDifficile', difficile ? 'oui' : 'non')
+}
+
 const CLE_SCORES = 'scores'
 
 // Lit la liste des parties enregistrées.
