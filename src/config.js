@@ -5,7 +5,7 @@ export const USER_AGENT_API = import.meta.env.VITE_API_USER_AGENT
 export const DELAI_API_MS = Number(import.meta.env.VITE_API_DELAI_MS)
 
 // Message clair si le fichier .env est absent ou incomplet
-if (!API_WIKTIONNAIRE || !PAGE_WIKTIONNAIRE || !USER_AGENT_API || !DELAI_API_MS) {
+if (!API_WIKTIONNAIRE || !PAGE_WIKTIONNAIRE || !USER_AGENT_API || !DELAI_API_MS || !FUSEAU || !DATE_DEPART) {
   console.error('Configuration manquante : vérifie le fichier .env (voir le README)')
 }
 
@@ -14,3 +14,6 @@ export const LONGUEUR_MOT = 5
 export const ESSAIS_MAX = 6
 export const POINTS_PAR_ESSAI = 100
 export const TAILLE_CLASSEMENT = 10
+
+export const FUSEAU = import.meta.env.VITE_FUSEAU
+export const DATE_DEPART = import.meta.env.VITE_DATE_DEPART
