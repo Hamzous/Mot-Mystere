@@ -198,6 +198,24 @@ a:focus-visible {
   border-color: var(--violet);
 }
 
+/* Case à cocher du mode difficile, sur sa propre ligne sous les boutons */
+.option-difficile {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--texte-doux);
+  cursor: pointer;
+}
+
+.page-accueil .option-difficile input {
+  flex: none;
+  min-width: 0;
+  padding: 0;
+  accent-color: var(--violet);
+}
+
 .liens-accueil {
   display: flex;
   flex-wrap: wrap;

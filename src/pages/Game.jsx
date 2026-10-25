@@ -9,8 +9,15 @@ import { creerEtatDuJour } from '../game/partieDuJour'
 import { calculerPoints } from '../game/score'
 import { etatsLettres } from '../game/clavier'
 import { estDansLaListe } from '../game/dictionnaireLocal'
+import { verifierModeDifficile } from '../game/modeDifficile'
 import { verifierMot, lienWiktionnaire } from '../api/wiktionary'
-import {lirePseudo, enregistrerPartie, lirePartieDuJour, sauverPartieDuJour } from '../storage/storage'
+import {
+  lirePseudo,
+  enregistrerPartie,
+  lirePartieDuJour,
+  sauverPartieDuJour,
+  lireModeDifficile,
+} from '../storage/storage'
 import CompteARebours from '../components/CompteARebours'
 import BoutonPartage from '../components/boutonPartage'
 import { genererTextePartage } from '../game/partage'
@@ -22,6 +29,8 @@ function Game({ mode }) {
   const [pseudo] = useState(() => lirePseudo() || 'Anonyme')
   const [jour] = useState(() => (modeJour ? tirerMotDuJour() : null))
   const [sauvegarde] = useState(() => (modeJour ? lirePartieDuJour(jour.date, pseudo) : null))
+  // Mode difficile : partie libre seulement (le mot du jour reste le même pour tout le monde)
+  const [difficile] = useState(() => !modeJour && lireModeDifficile())
 
   // Partie du jour : on reprend la sauvegarde. Partie libre : on tire un mot au hasard.
   const [etat, dispatch] = useReducer(reducteurPartie, null, () => {
@@ -56,6 +65,15 @@ function Game({ mode }) {
         return
       }
 
+      // Mode difficile : on refuse tout de suite un mot qui oublie un indice (pas besoin du dictionnaire)
+      if (difficile) {
+        const erreur = verifierModeDifficile(etat.essais, etat.resultats, etat.propositionEnCours)
+        if (erreur !== '') {
+          dispatch({ type: 'MOT_REFUSE', message: erreur })
+          return
+        }
+      }
+
       dispatch({ type: 'DEBUT_VERIFICATION' })
       const resultat = await verifierMot(etat.propositionEnCours)
 
@@ -78,7 +96,7 @@ function Game({ mode }) {
         dispatch({ type: 'VALIDER' })
       }
     },
-    [etat]
+    [etat, difficile]
   )
 
   // On écoute le vrai clavier
@@ -139,14 +157,15 @@ function Game({ mode }) {
       pseudo: pseudo,
       mot: etat.motAffiche,
       essais: etat.essais.length,
-      points: calculerPoints(etat.statut, etat.essais.length),
+      points: calculerPoints(etat.statut, etat.essais.length, difficile),
       statut: etat.statut,
       date: new Date().toISOString(),
       mode: modeJour ? 'jour' : 'libre',
+      difficile: difficile,
       jour: modeJour ? jour.date : null,
       duree: duree,
     })
-  }, [etat.statut, etat.motAffiche, etat.essais.length, dejaTerminee, modeJour, jour, pseudo])
+  }, [etat.statut, etat.motAffiche, etat.essais.length, dejaTerminee, modeJour, jour, pseudo, difficile])
 
   function rejouer() {
     const tirage = tirerMotMystere()
@@ -159,6 +178,7 @@ function Game({ mode }) {
     <div className="page-jeu">
       <h1>Le Mot Mystère</h1>
       {modeJour && <p>Mot du jour du {jour.date.split('-').reverse().join('/')}</p>}
+      {difficile && <p>Mode difficile</p>}
 
       <Grille
         essais={etat.essais}
@@ -185,7 +205,7 @@ function Game({ mode }) {
           <p>
             Le mot était : <strong>{etat.motAffiche}</strong>
           </p>
-          <p className="points">Points : {calculerPoints(etat.statut, etat.essais.length)}</p>
+          <p className="points">Points : {calculerPoints(etat.statut, etat.essais.length, difficile)}</p>
 
           {modeJour ? (
             
