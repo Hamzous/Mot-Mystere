@@ -162,6 +162,7 @@ function Game({ mode }) {
       date: new Date().toISOString(),
       mode: modeJour ? 'jour' : 'libre',
       difficile: difficile,
+      jour: modeJour ? jour.date : null,
       duree: duree,
     })
   }, [etat.statut, etat.motAffiche, etat.essais.length, dejaTerminee, modeJour, jour, pseudo, difficile])
