@@ -3,8 +3,9 @@ export function normaliser(mot) {
   let resultat = mot
 
   // œ n'est pas une lettre accentuée, on la remplace à la main
-  resultat = resultat.replace('œ', 'oe')
-  resultat = resultat.replace('æ', 'ae')
+  // (/g : toutes les occurrences, pas seulement la première ; et aussi en majuscule)
+  resultat = resultat.replace(/œ/g, 'oe').replace(/Œ/g, 'OE')
+  resultat = resultat.replace(/æ/g, 'ae').replace(/Æ/g, 'AE')
 
   // "NFD" sépare "é" en "e" + accent, puis on supprime les accents
   resultat = resultat.normalize('NFD')

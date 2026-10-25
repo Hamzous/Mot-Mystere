@@ -20,3 +20,16 @@ describe('motMystere', () => {
     }
   })
 })
+
+describe('normaliser', () => {
+  it('retire les accents et met en majuscules', () => {
+    expect(normaliser('école')).toBe('ECOLE')
+    expect(normaliser('scène')).toBe('SCENE')
+  })
+
+  it('remplace chaque œ, même en majuscule', () => {
+    expect(normaliser('cœur')).toBe('COEUR')
+    expect(normaliser('Œuvre')).toBe('OEUVRE')
+    expect(normaliser('œœ')).toBe('OEOE')
+  })
+})
