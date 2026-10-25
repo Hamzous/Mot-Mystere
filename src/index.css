@@ -492,3 +492,22 @@ a:focus-visible {
   background: var(--violet);
   border-color: var(--violet);
 }
+
+/* Liste déroulante du filtre des scores */
+.filtre-scores {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: var(--texte-doux);
+}
+
+.filtre-scores select {
+  padding: 6px 10px;
+  font: inherit;
+  color: var(--texte);
+  background: var(--fond-doux);
+  border: 2px solid var(--bordure);
+  border-radius: 8px;
+}
