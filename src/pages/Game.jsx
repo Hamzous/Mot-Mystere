@@ -11,6 +11,7 @@ import { etatsLettres } from '../game/clavier'
 import { estDansLaListe } from '../game/dictionnaireLocal'
 import { verifierMot, lienWiktionnaire } from '../api/wiktionary'
 import {lirePseudo, enregistrerPartie, lirePartieDuJour, sauverPartieDuJour } from '../storage/storage'
+import CompteARebours from '../components/CompteARebours'
 
 function Game({ mode }) {
   const modeJour = mode === 'jour'
@@ -184,7 +185,7 @@ function Game({ mode }) {
           <p className="points">Points : {calculerPoints(etat.statut, etat.essais.length)}</p>
 
           {modeJour ? (
-            <p>Reviens demain pour un nouveau mot !</p>
+            <CompteARebours />
           ) : (
             <button onClick={rejouer}>Nouvelle partie</button>
           )}

@@ -416,3 +416,15 @@ a:focus-visible {
   border: 2px solid var(--violet);
   box-shadow: none;
 }
+/* ---------- Compte à rebours ---------- */
+.compte-a-rebours {
+  width: 100%;
+  /* chiffres de largeur fixe : le texte ne bouge pas à chaque seconde */
+  font-variant-numeric: tabular-nums;
+}
+
+.compte-a-rebours strong {
+  font-size: 1.3rem;
+  letter-spacing: 1px;
+  color: var(--violet-clair);
+}
