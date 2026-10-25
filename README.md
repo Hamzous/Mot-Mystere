@@ -2,7 +2,7 @@
 
 Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propositions sont vérifiées auprès de l'API du Wiktionnaire.
 
-> Site en ligne (Vercel) : *à compléter dès le déploiement (palier 4)*
+> Site en ligne (Vercel) : https://mot-mystere-ten.vercel.app/
 
 ## Binôme
 
@@ -45,7 +45,7 @@ Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propos
 - [x] Indicateur « Vérification du mot… » et validation bloquée pendant la vérification
 - [x] Si l'API ne répond pas : le jeu continue avec une liste de secours (voir « Choix techniques »)
 - [x] La ligne montre visuellement le refus (bordures rouges et tremblement)
-- [ ] Écran de fin avec le mot **avec ses accents** et un lien vers sa page du Wiktionnaire : le code est prêt, il manque le fichier `mots_solutions.json` avec les accents
+- [x] Écran de fin avec le mot et un lien vers sa page du Wiktionnaire 
 
 ### Palier 3 : le confort de jeu (terminé)
 
@@ -66,7 +66,7 @@ Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propos
 - [x] Plus de 5 tests automatiques, dont 2 sur les lettres en double
 - [x] `vercel.json` : toutes les adresses renvoient `index.html`, pour que les routes marchent au rafraîchissement
 - [x] Classement du jour (points, puis temps de résolution), distinct du classement général
-- [ ] Mise en ligne sur Vercel : en cours
+- [x] Mise en ligne sur Vercel 
 
 ### Palier 5 : les variantes (commencé)
 
