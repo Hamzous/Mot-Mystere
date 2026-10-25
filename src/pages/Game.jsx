@@ -12,6 +12,8 @@ import { estDansLaListe } from '../game/dictionnaireLocal'
 import { verifierMot, lienWiktionnaire } from '../api/wiktionary'
 import {lirePseudo, enregistrerPartie, lirePartieDuJour, sauverPartieDuJour } from '../storage/storage'
 import CompteARebours from '../components/CompteARebours'
+import BoutonPartage from '../components/boutonPartage'
+import { genererTextePartage } from '../game/partage'
 
 function Game({ mode }) {
   const modeJour = mode === 'jour'
@@ -185,7 +187,11 @@ function Game({ mode }) {
           <p className="points">Points : {calculerPoints(etat.statut, etat.essais.length)}</p>
 
           {modeJour ? (
-            <CompteARebours />
+            
+            <>
+              <BoutonPartage texte={genererTextePartage(jour.date, etat.resultats, etat.statut)} />
+              <CompteARebours />
+            </>
           ) : (
             <button onClick={rejouer}>Nouvelle partie</button>
           )}
