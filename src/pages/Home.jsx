@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { lirePseudo, enregistrerPseudo } from '../storage/storage'
 import { LONGUEUR_MOT, ESSAIS_MAX } from '../config'
+import CompteARebours from '../components/CompteARebours'
 
 function Home() {
   // Le pseudo affiché dans le champ. Au départ, on reprend celui déjà enregistré.
@@ -42,6 +43,8 @@ function Home() {
           Mot du jour
         </button>
       </form>
+
+      <CompteARebours />
 
       <nav className="liens-accueil">
         <Link to="/scores">Scores</Link>
