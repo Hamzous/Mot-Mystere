@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { meilleuresParties, classementDuJour } from './classement'
+import { meilleuresParties, classementDuJour, filtrerParMode } from './classement'
 
 function creerPartie(pseudo, points, date, statut = 'gagne') {
   return { pseudo, mot: 'arbre', essais: 3, points, statut, date }
@@ -82,5 +82,25 @@ describe('classementDuJour', () => {
   it('ne classe pas les parties perdues', () => {
     const parties = [partieDuJour('A', 0, 1000, '2026-10-25', 'perdu')]
     expect(classementDuJour(parties, '2026-10-25').length).toBe(0)
+  })
+})
+
+describe('filtrerParMode', () => {
+  const parties = [
+    { ...creerPartie('Normal', 300, '2026-10-01'), difficile: false },
+    { ...creerPartie('Difficile', 450, '2026-10-02'), difficile: true },
+    creerPartie('Ancienne', 200, '2026-09-01'), // enregistrée avant le mode difficile
+  ]
+
+  it('garde toutes les parties avec le filtre "tous"', () => {
+    expect(filtrerParMode(parties, 'tous').length).toBe(3)
+  })
+
+  it('garde seulement les parties difficiles', () => {
+    expect(filtrerParMode(parties, 'difficile').map((p) => p.pseudo)).toEqual(['Difficile'])
+  })
+
+  it('compte les parties sans le champ "difficile" comme normales', () => {
+    expect(filtrerParMode(parties, 'normal').map((p) => p.pseudo)).toEqual(['Normal', 'Ancienne'])
   })
 })
