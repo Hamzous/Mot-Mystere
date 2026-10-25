@@ -6,8 +6,8 @@ Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propos
 
 ## Binôme
 
-- Hamza
-- Mohammed 
+- Hamza Mouhim
+- Mohamed Rherbaoui
 
 ## Palier visé
 
@@ -15,14 +15,14 @@ Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propos
 
 ## État des paliers
 
-*Dernière mise à jour : 24 octobre 2026*
+*Dernière mise à jour : 25 octobre 2026*
 
 | Palier | Contenu | État |
 |---|---|---|
 | 1 | Le jeu | Terminé |
-| 2 | Le dictionnaire | Presque terminé (voir détail) |
-| 3 | Le confort de jeu | Commencé (scores et statistiques) |
-| 4 | Le mot du jour | Pas commencé |
+| 2 | Le dictionnaire | Presque terminé (il manque les accents en fin de partie) |
+| 3 | Le confort de jeu | Terminé |
+| 4 | Le mot du jour | Presque terminé (déploiement et classement du jour en cours) |
 | 5 | Les variantes | Pas commencé |
 | 6 | Les quatre grilles | Pas commencé |
 
@@ -44,21 +44,33 @@ Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propos
 - [x] Un mot refusé ne compte pas comme un essai, le joueur est averti par un message
 - [x] Indicateur « Vérification du mot… » et validation bloquée pendant la vérification
 - [x] Si l'API ne répond pas : le jeu continue avec une liste de secours (voir « Choix techniques »)
-- [ ] La ligne montre visuellement le refus (style rouge sur la ligne) : à faire
+- [x] La ligne montre visuellement le refus (bordures rouges et tremblement)
 - [ ] Écran de fin avec le mot **avec ses accents** et un lien vers sa page du Wiktionnaire : le code est prêt, il manque le fichier `mots_solutions.json` avec les accents
 
-### Palier 3 : le confort de jeu (commencé)
+### Palier 3 : le confort de jeu (terminé)
 
-- [x] Tableau des scores : les 10 meilleures parties, classées par points (code écrit, en cours de test)
-- [x] Écran de statistiques : parties jouées, % de victoires, séries, total des points, répartition par nombre d'essais (code écrit, en cours de test)
-- [ ] Clavier à l'écran avec les touches colorées
-- [ ] Animations (retournement des cases, tremblement quand un mot est refusé)
-- [ ] Écran des règles avec exemple illustré des trois couleurs
-- [ ] Accueil avec accès aux règles : le lien existe, la page est à écrire
+- [x] Tableau des scores : les 10 meilleures parties, classées par points
+- [x] Écran de statistiques : parties jouées, % de victoires, séries, total des points, répartition par nombre d'essais
+- [x] Clavier à l'écran avec les touches colorées
+- [x] Animations (retournement des cases, tremblement quand un mot est refusé)
+- [x] Écran des règles avec exemple illustré des trois couleurs
+- [x] Accueil avec accès à la partie, aux scores, aux statistiques et aux règles
 
-### Paliers 4 à 6
+### Palier 4 : le mot du jour (presque terminé)
 
-Pas commencés. Prochaine étape : finir le palier 2, puis la fin du palier 3, puis le mot du jour et le déploiement.
+- [x] Mot du jour identique pour tous, qui change à minuit (heure de Paris), sur `/jour`
+- [x] Partie libre toujours disponible sur `/jeu`
+- [x] Partie du jour reprise au rechargement et non rejouable
+- [x] Compte à rebours jusqu'au prochain mot
+- [x] Partage du résultat en emojis dans le presse-papiers
+- [x] Plus de 5 tests automatiques, dont 2 sur les lettres en double
+- [x] `vercel.json` : toutes les adresses renvoient `index.html`, pour que les routes marchent au rafraîchissement
+- [ ] Classement du jour : en cours
+- [ ] Mise en ligne sur Vercel : en cours
+
+### Paliers 5 et 6
+
+Pas commencés.
 
 ## Installer, lancer, tester
 
@@ -98,9 +110,9 @@ src/
   api/         tous les appels au Wiktionnaire (un seul fichier)
   storage/     lecture et écriture dans le localStorage
   data/        liste des mots solutions
-  components/  affichage uniquement : Grille, Ligne, Case
+  components/  affichage uniquement : Grille, Ligne, Case, Keyboard, CompteARebours, BoutonPartage
   pages/       un fichier par écran : Home, Game, Scores, Stats, Rules
-  styles/      CSS de la grille
+  styles/      CSS de la grille et des animations
 ```
 
 | Fichier | Rôle |
@@ -158,11 +170,11 @@ Le simple critère « catégorie qui finit par *en français* » ne suffit pas, 
 
 ## Répartition du travail
 
-- **Hamza** : logique du jeu (`game/`), tirage du mot, pseudo (`storage`, accueil), page de partie, appel au Wiktionnaire et liste de secours, scores et statistiques, configuration (`.env`), mise en forme générale (`index.css`).
-- **Binôme** : routes React Router, composants `Grille`, `Ligne`, `Case` et leur CSS.
+- **Hamza** : logique du jeu (`game/`), tirage du mot, pseudo (`storage`, accueil), page de partie, appel au Wiktionnaire et liste de secours, scores et statistiques, clavier à l'écran, animations, écran des règles, mot du jour, compte à rebours, partage, configuration (`.env`), mise en forme générale (`index.css`).
+- **Mohamed** : routes React Router, composants `Grille`, `Ligne`, `Case` et leur CSS, configuration Vercel (`vercel.json`), mise à jour du README.
 
 ## Suite prévue
 
-1. Finir le palier 2 (ligne refusée visible, écran de fin avec accents et lien).
-2. Finir le palier 3 : clavier à l'écran, animations, écran des règles.
-3. Palier 4 : mot du jour, déploiement Vercel (`vercel.json` déjà en place pour les rafraîchissements), compte à rebours, partage.
+1. Finir le palier 2 : récupérer la liste de mots d'origine avec les accents, pour l'écran de fin.
+2. Finir le palier 4 : classement du jour et mise en ligne sur Vercel.
+3. Palier 5 : mots de 6 et 7 lettres, mode difficile.
