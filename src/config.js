@@ -5,6 +5,8 @@ export const USER_AGENT_API = import.meta.env.VITE_API_USER_AGENT
 export const DELAI_API_MS = Number(import.meta.env.VITE_API_DELAI_MS)
 export const FUSEAU = import.meta.env.VITE_FUSEAU
 export const DATE_DEPART = import.meta.env.VITE_DATE_DEPART
+export const NOM_JEU = 'Le Mot Mystère'
+export const EMOJIS_COULEURS = { vert: '🟩', jaune: '🟨', gris: '⬛' }
 
 // Message clair si le fichier .env est absent ou incomplet
 // (ce test doit rester APRÈS les déclarations ci-dessus)
