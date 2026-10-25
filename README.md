@@ -20,9 +20,9 @@ Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propos
 | Palier | Contenu | État |
 |---|---|---|
 | 1 | Le jeu | Terminé |
-| 2 | Le dictionnaire | Presque terminé (il manque les accents en fin de partie) |
+| 2 | Le dictionnaire | Terminé |
 | 3 | Le confort de jeu | Terminé |
-| 4 | Le mot du jour | Presque terminé (mise en ligne en cours) |
+| 4 | Le mot du jour | Terminé |
 | 5 | Les variantes | Commencé (mode difficile, filtre des scores) |
 | 6 | Les quatre grilles | Pas commencé |
 
@@ -38,14 +38,14 @@ Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propos
 - [x] Points affichés, nouvelle partie, retour à l'accueil
 - [x] Logique du jeu séparée de l'affichage (dossier `src/game/`)
 
-### Palier 2 : le dictionnaire (presque terminé)
+### Palier 2 : le dictionnaire (terminé)
 
 - [x] Chaque proposition est vérifiée auprès du Wiktionnaire (mots français uniquement)
 - [x] Un mot refusé ne compte pas comme un essai, le joueur est averti par un message
 - [x] Indicateur « Vérification du mot… » et validation bloquée pendant la vérification
 - [x] Si l'API ne répond pas : le jeu continue avec une liste de secours (voir « Choix techniques »)
 - [x] La ligne montre visuellement le refus (bordures rouges et tremblement)
-- [x] Écran de fin avec le mot et un lien vers sa page du Wiktionnaire 
+- [x] Écran de fin avec le mot **avec ses accents** (`scène`, `cœur`…) et un lien vers sa page du Wiktionnaire
 
 ### Palier 3 : le confort de jeu (terminé)
 
@@ -56,7 +56,7 @@ Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propos
 - [x] Écran des règles avec exemple illustré des trois couleurs
 - [x] Accueil avec accès à la partie, aux scores, aux statistiques et aux règles
 
-### Palier 4 : le mot du jour (presque terminé)
+### Palier 4 : le mot du jour (terminé)
 
 - [x] Mot du jour identique pour tous, qui change à minuit (heure de Paris), sur `/jour`
 - [x] Partie libre toujours disponible sur `/jeu`
@@ -66,7 +66,7 @@ Un jeu de lettres en React : trouver un mot de 5 lettres en 6 essais. Les propos
 - [x] Plus de 5 tests automatiques, dont 2 sur les lettres en double
 - [x] `vercel.json` : toutes les adresses renvoient `index.html`, pour que les routes marchent au rafraîchissement
 - [x] Classement du jour (points, puis temps de résolution), distinct du classement général
-- [x] Mise en ligne sur Vercel 
+- [x] Mise en ligne sur Vercel, mise à jour automatique à chaque envoi sur `main`
 
 ### Palier 5 : les variantes (commencé)
 
@@ -149,7 +149,7 @@ Le principe : `game` calcule, `components` affichent, `pages` assemblent, `stora
 
 **Coloration des lettres en double.** `evaluerProposition` fait deux passages. Le premier marque les lettres bien placées (vert) et met de côté les autres lettres du mot mystère. Le second donne un jaune seulement s'il reste encore un exemplaire de cette lettre dans la réserve, qu'on retire ensuite. Sans ça, `ERRER` sur `ARBRE` donnerait trop de jaunes.
 
-**Accents.** Les mots se jouent sans accents. `normaliser` utilise `normalize('NFD')` pour séparer les lettres de leurs accents, puis supprime les accents. La ligature `œ` n'est pas une lettre accentuée : elle est remplacée à la main par `oe`. Le mot d'origine (avec accents) est gardé à côté pour l'écran de fin.
+**Accents.** Les mots se jouent sans accents. `normaliser` utilise `normalize('NFD')` pour séparer les lettres de leurs accents, puis supprime les accents. La ligature `œ` n'est pas une lettre accentuée : elle est remplacée à la main par `oe` (toutes les occurrences, minuscules et majuscules). Le mot d'origine (avec accents) est gardé à côté pour l'écran de fin.
 
 **`useReducer` pour la partie.** Tout l'état de la partie est dans un reducer, une fonction pure testée sans interface. Le reducer ne tire pas le mot au hasard et n'appelle pas l'API : on lui donne le mot, et `Game.jsx` appelle `verifierMot` puis envoie l'action `VALIDER` ou `MOT_REFUSE`.
 
@@ -176,17 +176,15 @@ Le simple critère « catégorie qui finit par *en français* » ne suffit pas, 
 - **Les lettres en double.** Premier jet à un seul passage : une lettre jaune pouvait « voler » celle d'un vert situé plus loin. Résolu par les deux passages avec une réserve de lettres, et des tests sur `ARBRE` / `ERRER` et `PLAGE` / `ALLEE`.
 - **Savoir si un mot est français.** Tester l'existence de la page ne suffit pas. Nous avons testé l'API dans le navigateur sur plusieurs mots (`chats`, `house`) pour voir les catégories réellement renvoyées, ce qui a montré qu'il fallait distinguer « lemme » et « forme » en français.
 - **Écouteur clavier et état périmé.** Au palier 1, le clavier ne fait que des `dispatch`, donc il n'a pas besoin de lire l'état. Avec la vérification du dictionnaire, la fonction de validation lit la ligne en cours : l'effet dépend donc de l'état et se relance à chaque changement.
-- **Le mot avec accents.** Notre fichier de mots ne contient pas d'accents : pour afficher `scène` et faire le bon lien Wiktionnaire, il faut la liste d'origine avec les accents.
+- **Le mot avec accents.** Le fichier `mots_solutions.json` fourni ne contenait en réalité aucun accent (`scene`, `coeur`, `ecran`…) : l'écran de fin affichait donc un mot mal écrit, et le lien Wiktionnaire pouvait mener à une mauvaise page. Nous avons relu les 300 mots et rétabli l'orthographe des six mots concernés (`câble`, `cœur`, `écran`, `grâce`, `scène`, `sœur`). L'ordre de la liste n'a pas changé, donc le mot du jour reste le même.
 - **Les séries dans les statistiques.** Une série dépend de l'ordre des parties : on trie d'abord par date, sinon une liste dans le désordre donne de fausses séries (cas couvert par un test).
 - **Organisation Git.** Une erreur de workflow (envoi direct sur `main` au lieu d'une branche) : le code était sain, rien n'a été cassé. Nous reprenons une branche par fonctionnalité.
 
 ## Répartition du travail
 
 - **Hamza** : logique du jeu (`game/`), tirage du mot, pseudo (`storage`, accueil), page de partie, appel au Wiktionnaire et liste de secours, scores et statistiques, clavier à l'écran, animations, écran des règles, mot du jour, compte à rebours, partage, configuration (`.env`), mise en forme générale (`index.css`).
-- **Mohamed** : routes React Router, composants `Grille`, `Ligne`, `Case` et leur CSS, configuration Vercel (`vercel.json`), mode difficile (logique, tests, réglage, points), filtre des scores par mode, mise à jour du README.
+- **Mohamed** : routes React Router, composants `Grille`, `Ligne`, `Case` et leur CSS, configuration Vercel (`vercel.json`), mode difficile (logique, tests, réglage, points), filtre des scores par mode, accents de la liste de mots et correction de `normaliser`, mise à jour du README.
 
 ## Suite prévue
 
-1. Finir le palier 2 : récupérer la liste de mots d'origine avec les accents, pour l'écran de fin.
-2. Finir le palier 4 : mise en ligne sur Vercel.
-3. Finir le palier 5 : mots de 6 et 7 lettres.
+1. Finir le palier 5 : mots de 6 et 7 lettres, longueur dans l'adresse, filtre des scores par longueur.
